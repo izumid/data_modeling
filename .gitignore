@@ -1,0 +1,10 @@
+# Ignore folders and its contents
+/file/
+
+# Ignore files, keep folders
+file/*
+!file/.gitkeep
+
+# Ignore specific files
+compose.bat
+docker-compose.yml

@@ -1,0 +1,14 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:17.5
+    restart: always
+    environment:
+      - POSTGRES_USER=sysadmin
+      - POSTGRES_PASSWORD=!@sysadmin#$
+      - POSTGRES_DB=dbDesiredName
+    ports: 
+      - "5432:5432"
+    volumes:
+      - C:/Users/Serv/Desktop/data_modeling/file:/var/lib/postgresql/data
+      - C:/Users/Serv/Desktop/data_modeling/init-script:/docker-entrypoint-initdb.d
