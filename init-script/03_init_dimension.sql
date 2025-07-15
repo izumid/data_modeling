@@ -1,4 +1,3 @@
-USE dbCorp;
 -- MARK: Dimensions
 -- Prefix are feed by (Quote,Issuance);
 -- ManufactureYear,Id_AirshipUsage (I);
@@ -18,48 +17,6 @@ CREATE TABLE Corp.dimAeronave(
 	,Piloto 			VARCHAR(255) NULL
 	,RegistroEncerrado 	Date NULL
 	,PRIMARY KEY (Id)
-);
-
-
-DROP TABLE IF EXISTS Aeronautico.dimAeronave;
-CREATE TABLE Aeronautico.dimAeronave(
-     Id					SERIAL
-	,CodNacionalidade 	VARCHAR(50) NULL
-	,Fabricante			VARCHAR(255) NULL
-	,Modelo				VARCHAR(50) NULL
-	,AnoFabricacao 		SMALLINT NULL
-	--,IdAirshipUsage 	INT NULL
-	,TipoUtilizacao		VARCHAR(255) NULL
-	,RegistroEncerrado 	DATE NULL
-	,PRIMARY KEY (Id)
-);
-
-
-DROP TABLE IF EXISTS Sinistro.dimAeronave;
-CREATE TABLE Sinistro.dimAeronave(
-     Id 				SERIAL
-	,CodNacionalidade	VARCHAR(50) NULL
-	,CodAnac			INT NULL
-	,AnoFabricacao 		SMALLINT NULL
-	,Piloto 			VARCHAR(255) NULL
-	,TipoUtilizacao 	VARCHAR(255) NULL
-	,RegistroEncerrado 	DATE NULL
-	,PRIMARY KEY (Id)
-);
-
-
-DROP TABLE IF EXISTS Aeronautico.TipoUtilizacao;
-CREATE TABLE Aeronautico.TipoUtilizacao(
-	 Id Serial
-	,Nome VARCHAR(255)
-	,PRIMARY KEY (Id)
-);
-
-DROP TABLE IF EXISTS Sinistro.dimCausa;
-CREATE TABLE Sinistro.dimCausa(
-    Id Serial
-    ,Nome varchar(50) NOT NULL
-    ,PRIMARY KEY (Id)
 );
 
 -- MARK: Corp Dim
@@ -159,8 +116,51 @@ CREATE TABLE Corp.dimRegulador(
 	,PRIMARY KEY (Id)
 );
 
-DROP TABLE IF EXISTS  Corp.dimSinistroSituacao;
-CREATE TABLE Corp.dimSinistroSituacao;(
+
+-- MARK: Aeronautico
+DROP TABLE IF EXISTS Aeronautico.dimAeronave;
+CREATE TABLE Aeronautico.dimAeronave(
+     Id					SERIAL
+	,CodNacionalidade 	VARCHAR(50) NULL
+	,Fabricante			VARCHAR(255) NULL
+	,Modelo				VARCHAR(50) NULL
+	,AnoFabricacao 		SMALLINT NULL
+	--,IdAirshipUsage 	INT NULL
+	,TipoUtilizacao		VARCHAR(255) NULL
+	,RegistroEncerrado 	DATE NULL
+	,PRIMARY KEY (Id)
+);
+
+DROP TABLE IF EXISTS Aeronautico.dimTipoUtilizacao;
+CREATE TABLE Aeronautico.dimTipoUtilizacao(
+	 Id Serial
+	,Nome VARCHAR(255)
+	,PRIMARY KEY (Id)
+);
+
+DROP TABLE IF EXISTS Sinistro.dimAeronave;
+CREATE TABLE Sinistro.dimAeronave(
+     Id 				SERIAL
+	,CodNacionalidade	VARCHAR(50) NULL
+	,CodAnac			INT NULL
+	,AnoFabricacao 		SMALLINT NULL
+	,Piloto 			VARCHAR(255) NULL
+	,TipoUtilizacao 	VARCHAR(255) NULL
+	,RegistroEncerrado 	DATE NULL
+	,PRIMARY KEY (Id)
+);
+
+
+-- MARK: Sinistro
+DROP TABLE IF EXISTS Sinistro.dimCausa;
+CREATE TABLE Sinistro.dimCausa(
+    Id Serial
+    ,Nome varchar(50) NOT NULL
+    ,PRIMARY KEY (Id)
+);
+
+DROP TABLE IF EXISTS  Sinistro.dimSituacao;
+CREATE TABLE Sinistro.dimSituacao(
 	Id Serial
 	,Nome VARCHAR(50)
 	,PRIMARY KEY (Id)

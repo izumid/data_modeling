@@ -1,5 +1,6 @@
 # Ignore folders and its contents
 /file/
+**/-v/
 
 # Ignore files, keep folders
 file/*

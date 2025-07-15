@@ -1,4 +1,8 @@
 @ECHO off
+
+ECHO [Stopping & Removing] Compose setup
+docker compose down -v
+
 ECHO [Stop] All containers
 FOR /F "tokens=*" %%i IN ('docker ps -q') DO docker stop %%i
 
@@ -12,13 +16,14 @@ ECHO [Cleaning] Not used volumes
 docker volume prune -f 
 
 ECHO [Cleaning] Volume files
-RD /S /Q "C:\Users\Serv\Desktop\data_modeling\file"
+SET "path_file=%~dp0\file\"
+DEL /q "%path_file%"
+FOR /d %%D IN ("%path_file%\*") DO RD /S /Q "%%D"
 
 ECHO [Cleaning] Not used networks
 docker network prune -f
 
 ECHO [Composing Up]
-
 docker compose up
 
 PAUSE

@@ -1,47 +1,51 @@
 
 -- MARK: UDF Try Cast
 -- postgress highly typed a function must have a typed return
-DROP FUNCTION IF EXISTS Cast_Date(IN input_value TEXT);
-CREATE FUNCTION public.Cast_Date(IN input_value TEXT) RETURNS DATE LANGUAGE plpgsql AS $function$
-DECLARE result DATE;
-BEGIN
+DROP FUNCTION IF EXISTS Corp.Cast_Date(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Date(IN input_value TEXT) RETURNS DATE 
+LANGUAGE plpgsql AS $function$
+	DECLARE result DATE;
 	BEGIN
-    result := input_value::DATE;
-    EXCEPTION WHEN others THEN
-        result := NULL;
-   END;
-    RETURN result;
-END;
-$function$
+		BEGIN
+		result := input_value::DATE;
+		EXCEPTION WHEN others THEN
+			result := NULL;
+	END;
+		RETURN result;
+	END;
+$function$;
 
-DROP FUNCTION IF EXISTS Cast_Decimal(IN input_value TEXT);
-CREATE FUNCTION public.Cast_Decimal(IN input_value TEXT) RETURNS DECIMAL(15,4) LANGUAGE plpgsql AS $function$
-DECLARE result DECIMAL(15,4);
-BEGIN
+DROP FUNCTION IF EXISTS Corp.Cast_Decimal(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Decimal(IN input_value TEXT) RETURNS DECIMAL(15,4)
+LANGUAGE plpgsql AS $function$
+	DECLARE result DECIMAL(15,4);
 	BEGIN
-    result := input_value::DECIMAL(15,4);
-    EXCEPTION WHEN others THEN
-        result := NULL;
-    END;
-    RETURN result;
-END;
-$function$
+		BEGIN
+		result := input_value::DECIMAL(15,4);
+		EXCEPTION WHEN others THEN
+			result := NULL;
+		END;
+		RETURN result;
+	END;
+$function$;
 
-DROP FUNCTION IF EXISTS Cast_Int(IN input_value TEXT);
-CREATE FUNCTION public.Cast_Int(IN input_value TEXT) RETURNS INTEGER LANGUAGE plpgsql AS $function$
-DECLARE result INTEGER;
-BEGIN
+DROP FUNCTION IF EXISTS Corp.Cast_Int(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Int(IN input_value TEXT) RETURNS INTEGER 
+LANGUAGE plpgsql AS $function$
+	DECLARE result INTEGER;
 	BEGIN
-    result := input_value::INTEGER;
-    EXCEPTION WHEN others THEN
-        result := NULL;
-    END;
-    RETURN result;
-END;
+		BEGIN
+		result := input_value::INTEGER;
+		EXCEPTION WHEN others THEN
+			result := NULL;
+		END;
+		RETURN result;
+	END;
+$function$;
 
 -- MARK: Quote Hist
-DROP PROCEDURE IF EXISTS usp_AeronauticoHistQuote;
-CREATE OR REPLACE PROCEDURE usp_AeronauticoHistQuote(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Aeronautico.usp_AeronauticoHistQuote;
+CREATE OR REPLACE PROCEDURE Aeronautico.usp_AeronauticoHistQuote(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql AS $procedure$
 BEGIN 
     -- SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
@@ -121,12 +125,12 @@ BEGIN
     -- Remove tabela temporaria, evitando conflitos de criacao
     DROP TABLE IF EXISTS RawData;
 END;
-$procedure$
+$procedure$;
 
 
 -- MARK: Issuance Hist
-DROP PROCEDURE IF EXISTS uspAeronauticoHistEmissao(IN date_initial DATE, IN date_final DATE);
-CREATE OR REPLACE PROCEDURE uspAeronauticoHistEmissao(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Aeronautico.uspAeronauticoHistEmissao(IN date_initial DATE, IN date_final DATE);
+CREATE OR REPLACE PROCEDURE Aeronautico.uspAeronauticoHistEmissao(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql
 AS $procedure$
 DECLARE
@@ -146,37 +150,36 @@ BEGIN
         DROP TABLE IF EXISTS RawDataHistIssuance;
         CREATE TEMP TABLE RawDataHistIssuance AS
             SELECT 
-                LOWER(TRIM(Arquivo)) AS Arquivo,
-                LOWER(TRIM(Aba)) AS Aba,
-				LinhaExcel
-                LOWER(TRIM(Segurado)) AS Segurado,
-                LOWER(TRIM(CnpjCpf)) AS CnpjCpf,
-                LOWER(TRIM(Ramo)) AS Ramo,
-                LOWER(TRIM(NumeroApolice)) AS NumeroApolice,
-                LOWER(TRIM(TipoDocumento)) AS TipoDocumento,
-                DataEmissao,
-                public.cast_date(VigenciaInicial) AS VigenciaInicial,
-                public.cast_date(VigenciaFinal) AS VigenciaFinal,
-                public.cast_decimal(PremioLiquido) AS PremioLiquido,
-                public.cast_decimal(ComissaoTotal) AS ComissaoTotal,
-                public.cast_decimal(ComissaoTotalValor) AS ComissaoTotalValor,
-                public.cast_decimal(QuantidadeParcela) AS QuantidadeParcela,
-                public.cast_date(PrimeiroVencimentoParcela) AS PrimeiroVencimentoParcela,
-                LOWER(TRIM(Corretor)) AS Corretor,
-                LOWER(TRIM(Prefixo)) AS Prefixo,
-                LOWER(TRIM(Cedente)) AS Cedente,
-                LOWER(TRIM(Fabricante)) AS Fabricante,
-                LOWER(TRIM(Modelo)) AS Modelo,
-                CASE WHEN LENGTH(AnoFabricacao) < 5 THEN AnoFabricacao::INT ELSE NULL END AS AnoFabricacao,
-                LOWER(TRIM(Utilizacao)) AS UTILIZACAO,
-				
-                public.cast_decimal(ImportanciaSeguradaCasco) AS ImportanciaSeguradaCasco,
-                public.cast_decimal(PremioLiquidoCasco) AS PremioLiquidoCasco,
-                public.cast_decimal(ImportanciaSeguradaLuc) AS ImportanciaSeguradaLuc,
-                public.cast_decimal(PremioLiquidoLuc) AS PremioLiquidoLuc,
-                public.cast_decimal(PremioLiquidoConvertido) AS PremioLiquidoConvertido,
-                public.cast_decimal(TaxaCambialEmissao) AS TaxaCambialEmissao,
-                CASE WHEN Renovacao = 'Sim' THEN 1 ELSE 0 END AS Renovacao
+				LOWER(TRIM(Arquivo)) AS Arquivo
+				,LOWER(TRIM(Aba)) AS Aba
+				,LinhaExcel
+				,LOWER(TRIM(Segurado)) AS Segurado
+				,LOWER(TRIM(CnpjCpf)) AS CnpjCpf
+				,LOWER(TRIM(Ramo)) AS Ramo
+				,LOWER(TRIM(NumeroApolice)) AS NumeroApolice
+				,LOWER(TRIM(TipoDocumento)) AS TipoDocumento
+				,DataEmissao
+				,public.cast_date(VigenciaInicial) AS VigenciaInicial
+				,public.cast_date(VigenciaFinal) AS VigenciaFinal
+				,public.cast_decimal(PremioLiquido) AS PremioLiquido
+				,public.cast_decimal(ComissaoTotal) AS ComissaoTotal
+				,public.cast_decimal(ComissaoTotalValor) AS ComissaoTotalValor
+				,public.cast_decimal(QuantidadeParcela) AS QuantidadeParcela
+				,public.cast_date(PrimeiroVencimentoParcela) AS PrimeiroVencimentoParcela
+				,LOWER(TRIM(Corretor)) AS Corretor
+				,LOWER(TRIM(Prefixo)) AS Prefixo
+				,LOWER(TRIM(Cedente)) AS Cedente
+				,LOWER(TRIM(Fabricante)) AS Fabricante
+				,LOWER(TRIM(Modelo)) AS Modelo
+				,CASE WHEN LENGTH(AnoFabricacao) < 5 THEN AnoFabricacao::INT ELSE NULL END AS AnoFabricacao
+				,LOWER(TRIM(Utilizacao)) AS UTILIZACAO
+				,public.cast_decimal(ImportanciaSeguradaCasco) AS ImportanciaSeguradaCasco
+				,public.cast_decimal(PremioLiquidoCasco) AS PremioLiquidoCasco
+				,public.cast_decimal(ImportanciaSeguradaLuc) AS ImportanciaSeguradaLuc
+				,public.cast_decimal(PremioLiquidoLuc) AS PremioLiquidoLuc
+				,public.cast_decimal(PremioLiquidoConvertido) AS PremioLiquidoConvertido
+				,public.cast_decimal(TaxaCambialEmissao) AS TaxaCambialEmissao
+				,CASE WHEN Renovacao = 'Sim' THEN 1 ELSE 0 END AS Renovacao
             FROM Aeronautico.stgEmissao
             WHERE DATAEMISSAO >= date_initial
             AND DATAEMISSAO < date_initial + INTERVAL '1 day';
@@ -201,8 +204,8 @@ END $procedure$;
 
 
 -- MARK: Hist Claim
-DROP PROCEDURE IF EXISTS uspSinistroHist;
-CREATE OR REPLACE PROCEDURE uspSinistroHist(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Sinistro.uspSinistroHist;
+CREATE OR REPLACE PROCEDURE Sinistro.uspSinistroHist(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql
 AS $procedure$
 BEGIN
@@ -283,329 +286,13 @@ BEGIN
     DROP TABLE IF EXISTS RawDataClaim;
 END $procedure$;
 
-/*
--- MARK: Dimension Update DOING
-DROP PROCEDURE IF EXISTS USP_Dim_Update;
-CREATE PROCEDURE USP_Dim_Update(IN date_initial DATE,IN date_final DATE)
-LANGUAGE plpgsql
-AS $$
-	BEGIN
-		IF (date_initial IS NULL AND date_final IS NULL) THEN
-			SELECT MIN(BrokerRequest) INTO date_initial FROM Aeronautical_Hist_Quote;
-	     	SELECT MAX(BrokerRequest) INTO date_final FROM Aeronautical_Hist_Quote;
-		END IF;
-		
-		-- SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-		
-		WHILE date_initial <= date_final DO	
-			
-			DROP TEMPORARY TABLE IF EXISTS tempDimData;
-			CREATE TEMPORARY TABLE tempDimData AS
-				SELECT
-				  Filename
-				  ,Sheet
-				  ,NULL AS Insured
-				  ,CodNacionality
-				  ,NULL AS CodAnac
-				  ,Broker
-				  ,BrokerRequest AS CtrlDate
-				  ,Coverage
-				  ,Underwriter
-				  ,Status
-				  ,Description
-				  ,NULL AS Assignor
-				  ,NULL AS Manufacturer
-				  ,NULL AS AirshipModel
-				  ,NULL AS AirshipManufactureYear
-				  ,NULL AS AirshipUsage
-				  ,NULL AS Pilot
-				  ,1 AS Source
-				FROM Aeronautical_Hist_Quote
-				WHERE BrokerRequest >= date_initial
-				AND BrokerRequest < DATE_ADD(date_initial, INTERVAL 1 DAY)
-
-				UNION ALL
-
-				SELECT 
-				  Filename
-				  ,Sheet
-				  ,Insured
-				  ,CodNacionality
-				  ,NULL AS CodAnac
-				  ,Broker
-				  ,IssueDate AS CtrlDate
-				  ,Coverage
-				  ,NULL AS Underwriter
-				  ,PolicyTpe AS 'Status'
-				  ,NULL AS Description
-				  ,Assignor
-				  ,Manufacturer
-				  ,AirshipModel
-				  ,AirshipManufactureYear
-				  ,AirshipUsage
-				  ,NULL AS Pilot
-				  ,2 AS Source
-				FROM Aeronautical_Hist_Issuance
-				WHERE IssueDate  >= date_initial
-				AND IssueDate < DATE_ADD(date_initial, INTERVAL 1 DAY)
-
-				UNION ALL
-
-				SELECT 
-				  Filename
-				  ,Sheet
-				  ,Insured
-				  ,CodNacionality
-				  ,CodAnac
-				  ,Broker
-  				  ,OcorrenceClaim AS CtrlDate
-				  ,RequestedCoverage AS 'Coverage'
-				  ,NULL AS Underwriter
-				  ,Status
-				  ,NULL AS Description
-				  ,Assignor
-				  ,NULL AS Manufacturer
-				  ,NULL AS AirshipModel
-				  ,NULL AS AirshipManufactureYear
-				  ,NULL AS AirshipUsage
-				  ,Pilot
-				  ,3 AS Source
-				FROM Claim_Hist
-				WHERE IssuanceStart  >= date_initial
-				AND IssuanceStart < DATE_ADD(date_initial, INTERVAL 1 DAY);
-		
-			-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-			
-			-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-			# insere aero
-			INSERT INTO Dim_Airship
-				SELECT DISTINCT
-					 NULL AS ID
-					,CodNacionality 
-					,CodAnac
-					,Manufacturer
-					,AirshipModel
-					,AirshipManufactureYear
-					,AirshipUsage
-					,Pilot
-					,NULL AS FinalDateControl
-				FROM tempDimData AS orig
-				WHERE CodNacionality IS NOT NULL
-				AND orig.Source = 2
-				AND NOT EXISTS(
-					SELECT 1 
-					FROM Dim_Airship AS dest
-					WHERE 1=1
-					AND dest.CodNacionality = orig.CodNacionality
-					-- AND da.FinalDateControl IS NULL
-				);
-			
-		
-			# insere sinistro se 'CodNacionality is not null and otherFields is null', se não nao existir
-			IF 1=1 THEN
-				INSERT INTO Dim_Airship
-					SELECT DISTINCT
-						 NULL AS ID
-						,CodNacionality 
-						,NULL AS CodAnac
-						,NULL AS Manufacturer
-						,NULL AS AirshipModel
-						,NULL AS AirshipManufactureYear
-						,NULL AS AirshipUsage
-						,NULL AS Pilot
-						,NULL AS FinalDateControl
-					FROM tempDimData AS orig
-					WHERE 1=1
-					AND orig.Source = 3
-					AND CodNacionality IS NOT NULL
-					AND NOT EXISTS(
-						SELECT 1 
-						FROM Dim_Airship AS dest
-						WHERE 1=1
-						AND dest.CodNacionality = orig.CodNacionality
-					)
-					AND (
-							orig.CodAnac 				IS NULL
-					 	AND orig.Manufacturer 			IS NULL
-					    AND orig.AirshipModel 			IS NULL
-					 	AND orig.AirshipManufactureYear IS NULL
-						AND orig.AirshipUsage 			IS NULL
-					    AND orig.Pilot 					IS NULL
-					);
-
-			END IF;
-			
-			IF 0=1 THEN
-			# descontinua registros
-			UPDATE Dim_Airship AS dest
-				SET dest.FinalDateControl = NOW()
-				WHERE 1=1
-				AND EXISTS(
-					SELECT 1 
-						FROM tempDimData AS orig
-						WHERE 1=1 
-						AND orig.Source = 3
-						AND orig.CodNacionality = dest.CodNacionality
-						AND NOT (
-								orig.CodAnac 				IS NULL
-						 	AND orig.Manufacturer 			IS NULL
-						    AND orig.AirshipManufactureYear IS NULL
-						    AND orig.AirshipModel 			IS NULL
-							AND orig.AirshipModel 			IS NULL
-						    AND orig.Pilot 					IS NULL
-							AND dest.CodAnac 				= orig.CodAnac
-						 	AND dest.Manufacturer			= orig.Manufacturer
-						    AND dest.ManufactureYear		= orig.AirshipManufactureYear
-						    AND dest.Model 					= orig.AirshipModel
-							AND dest.AirshipUsage 			= orig.AirshipUsage
-						    AND	dest.Pilot 					= orig.Pilot
-						)
-				);
-			END IF;
-			
-			# insere o novo registro se houver um com alguns dos outros capos não nulos ou diferente dos atuais
-			IF 0=1 THEN
-				/*INSERT INTO Dim_Airship
-					SELECT DISTINCT
-						 NULL AS ID
-						,COALESCE(dest.CodNacionality, orig.CodNacionality)				AS CodNacionality
-						,orig.CodAnac
-						,COALESCE(dest.Manufacturer, 	orig.Manufacturer) 				AS Manufacturer		
-						,COALESCE(dest.Manufacturer, 	orig.AirshipManufactureYear)	AS ManufactureYear
-						,COALESCE(dest.Model, 			orig.AirshipModel) 				AS Model
-						,COALESCE(dest.AirshipUsage, 	orig.AirshipUsage) 				AS AirshipUsage
-						,orig.Pilot
-						,NULL AS FinalDateControl
-					FROM tempDimData AS orig
-					LEFT JOIN Dim_Airship AS dest ON dest.CodNacionality = orig.CodNacionality	
-					WHERE orig.CodNacionality IS NOT NULL
-					AND orig.Source = 3
-					AND NOT (					
-							orig.CodAnac 				IS NULL
-					 	AND orig.Manufacturer 			IS NULL
-					    AND orig.AirshipManufactureYear IS NULL
-					    AND orig.AirshipModel 			IS NULL
-						AND orig.AirshipModel 			IS NULL
-					    AND orig.Pilot 					IS NULL
-					)
-					AND NOT(
-							dest.CodAnac 				= orig.CodAnac
-					 	AND dest.Manufacturer			= orig.Manufacturer
-					    AND dest.ManufactureYear		= orig.AirshipManufactureYear
-					    AND dest.Model 					= orig.AirshipModel
-						AND dest.AirshipUsage 			= orig.AirshipUsage
-					    AND	dest.Pilot 					= orig.Pilot
-					);*/
-			
-			
-					DROP TEMPORARY TABLE IF EXISTS tempNewData;
-					CREATE TEMPORARY TABLE tempNewData AS (
-						SELECT DISTINCT
-							 NULL AS ID
-							,orig.CodNacionality
-							,orig.CodAnac
-							,orig.Manufacturer		
-							,orig.AirshipManufactureYear
-							,orig.AirshipModel
-							,orig.AirshipUsage
-							,orig.Pilot
-							,NULL AS FinalDateControl
-						FROM tempDimData AS orig
-						WHERE orig.CodNacionality IS NOT NULL
-						AND orig.Source = 3
-						AND NOT EXISTS(
-							SELECT 1 
-							FROM Dim_Airship AS dest
-							WHERE 1=1
-							AND dest.CodNacionality = orig.CodNacionality
-							AND dest.FinalDateControl IS NULL
-						)
-					);
-					
-					-- inserir dados de sinistro que possuam alguma diferenca com os atuais da dimensao
-					INSERT INTO Dim_Airship
-					SELECT * FROM tempNewData AS orig 
-					WHERE NOT(
-							orig.CodAnac 				IS NULL
-					 	AND orig.Manufacturer 			IS NULL
-					    AND orig.AirshipManufactureYear IS NULL
-					    AND orig.AirshipModel 			IS NULL
-						AND orig.AirshipModel 			IS NULL
-					    AND orig.Pilot 					IS NULL
-					)
-					AND EXISTS(
-						SELECT 
-							1
-						FROM Dim_Airship AS dest
-						WHERE 1=1
-						AND dest.CodNacionality = orig.CodNacionality
-						AND dest.FinalDateControl IS  NULL
-						
-						AND NOT(
-						/*
-								  dest.CodAnac 			= orig.CodAnac OR (dest.CodAnac IS NOT NULL AND orig.CodAnac IS NULL)
-						      AND dest.Manufacturer		= orig.Manufacturer OR (dest.Manufacturer IS NOT NULL AND orig.Manufacturer IS NULL)
-						      AND dest.ManufactureYear 	= orig.AirshipManufactureYear OR (dest.ManufactureYear IS NOT NULL AND orig.AirshipManufactureYear IS NULL)
-						      AND dest.Model 			= orig.AirshipModel OR (dest.Model IS NOT NULL AND orig.AirshipModel IS NULL)
-						      AND dest.AirshipUsage		= orig.AirshipUsage OR (dest.AirshipUsage IS NOT NULL AND orig.AirshipUsage IS NULL)
-						      AND dest.Pilot 			= orig.Pilot OR (dest.Pilot IS NOT NULL AND orig.Pilot IS NULL)
-						      */
-														  (dest.CodAnac IS NOT NULL AND orig.CodAnac IS NULL)
-						      AND (dest.Manufacturer IS NOT NULL AND orig.Manufacturer IS NULL)
-						      AND (dest.ManufactureYear IS NOT NULL AND orig.AirshipManufactureYear IS NULL)
-						      AND (dest.Model IS NOT NULL AND orig.AirshipModel IS NULL)
-						      AND (dest.AirshipUsage IS NOT NULL AND orig.AirshipUsage IS NULL)
-						      AND (dest.Pilot IS NOT NULL AND orig.Pilot IS NULL)
-							/*
-								dest.CodAnac 				= orig.CodAnac
-						 	AND dest.Manufacturer			= orig.Manufacturer
-						    AND dest.ManufactureYear		= orig.AirshipManufactureYear
-						    AND dest.Model 					= orig.AirshipModel
-							AND dest.AirshipUsage 			= orig.AirshipUsage
-						    AND	dest.Pilot 					= orig.Pilot
-						   -- AND dest.FinalDateControl 		IS NULL 
-						   */
-					    )  
-					);
-						
-					/*
-					-- inserir dado caso o CodNacionality seja inexistente na dimensao
-					INSERT INTO Dim_Airship
-					SELECT * FROM tempNewData AS orig 
-					WHERE NOT(
-							orig.CodAnac 				IS NULL
-					 	AND orig.Manufacturer 			IS NULL
-					    AND orig.AirshipManufactureYear IS NULL
-					    AND orig.AirshipModel 			IS NULL
-						AND orig.AirshipModel 			IS NULL
-					    AND orig.Pilot 					IS NULL
-					)
-					AND NOT EXISTS(
-						SELECT 
-							1
-						FROM Dim_Airship AS dest
-						WHERE 1=1
-						AND dest.CodNacionality = orig.CodNacionality
-						AND dest.FinalDateControl IS NULL
-					);
-					*/
-						
-			END IF;
-			
-			SET date_initial =  DATE_ADD(date_initial, INTERVAL 1 DAY);
-			
-		END LOOP;
-		DROP TEMPORARY TABLE IF EXISTS tempNewData;
-		DROP TEMPORARY TABLE IF EXISTS tempDimData;
-	END$$;
-*/
 
 -- MARK: Quote Fact
-DROP PROCEDURE IF EXISTS USP_Aeronautical_Fact_Quote;
+DROP PROCEDURE IF EXISTS Aeronautico.uspFactQuote;
 
-CREATE OR REPLACE PROCEDURE USP_Aeronautical_Fact_Quote(IN date_initial DATE, IN date_final DATE)
+CREATE OR REPLACE PROCEDURE Aeronautico.uspFactQuote(IN date_initial DATE, IN date_final DATE)
 LANGUAGE plpgsql
-AS $$
+AS $procedure$
 BEGIN
     IF date_initial IS NULL AND date_final IS NULL THEN
         SELECT MIN(BrokerRequest) INTO date_initial FROM Aeronautical_Hist_Quote;
@@ -653,18 +340,18 @@ BEGIN
 
     -- Remove tabela temporária
     DROP TABLE IF EXISTS Dim_Data;
-END $$;
+END $procedure$;
 
 
 -- PROCEDURE: public.USP_Dim_Update(date, date)
 
 -- DROP PROCEDURE IF EXISTS public.USP_Dim_Update(date, date);
 
-CREATE OR REPLACE PROCEDURE public.USP_Dim_Update(
+CREATE OR REPLACE PROCEDURE Corp.USP_Dim_Update(
 	IN date_initial date DEFAULT NULL::date,
 	IN date_final date DEFAULT NULL::date)
 LANGUAGE 'plpgsql'
-AS $BODY$
+AS $procedure$
 	BEGIN
 		IF date_initial IS NULL AND date_final IS NULL THEN
 				SELECT MIN(BrokerRequest) INTO date_initial FROM Aeronautical_Hist_Quote;
@@ -802,6 +489,6 @@ AS $BODY$
 		END LOOP;
 		DROP TABLE IF EXISTS tempDimData;
 	END 
-$BODY$;
-ALTER PROCEDURE public.usp_dim_update(date, date)
-    OWNER TO sysadmin;
+$procedure$;
+
+-- ALTER PROCEDURE Corp.usp_dim_update(date, date) OWNER TO sysadmin;

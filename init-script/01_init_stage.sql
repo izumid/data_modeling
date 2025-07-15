@@ -1,4 +1,3 @@
-
 CREATE SCHEMA Aeronautico;
 DROP TABLE IF EXISTS Aeronautico.stgCotacao;
 CREATE TABLE Aeronautico.stgCotacao(
