@@ -44,15 +44,15 @@ LANGUAGE plpgsql AS $function$
 $function$;
 
 -- MARK: Quote Hist
-DROP PROCEDURE IF EXISTS Aeronautico.usp_AeronauticoHistQuote;
-CREATE OR REPLACE PROCEDURE Aeronautico.usp_AeronauticoHistQuote(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Aeronautico.uspAeronauticoHistCotacao;
+CREATE OR REPLACE PROCEDURE Aeronautico.uspAeronauticoHistCotacao(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql AS $procedure$
 BEGIN 
     -- SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     -- Verifica se os parâmetros de data são nulos e os define a partir do banco
     IF date_initial IS NULL AND date_final IS NULL THEN
-        SELECT MIN(DATADOPEDIDO) INTO date_initial FROM Aeronautico.stgCotacao;
-        SELECT MAX(DATADOPEDIDO) INTO date_final FROM Aeronautico.stgCotacao;
+        SELECT MIN(DataPedido) INTO date_initial FROM Aeronautico.stgCotacao;
+        SELECT MAX(DataPedido) INTO date_final FROM Aeronautico.stgCotacao;
     END IF;
 	
     WHILE date_initial <= date_final LOOP
@@ -65,8 +65,8 @@ BEGIN
                 LOWER(TRIM(Aba)) AS Aba,
 				LinhaExcel,
                 DataPedido,
-               	public.cast_date(DataRetornoCorretor) AS DataRetornoCorretor,
-               	public.cast_date(DataRetorno) AS DataRetorno,
+               	Corp.cast_date(DataRetornoCorretor) AS DataRetornoCorretor,
+               	Corp.cast_date(DataRetorno) AS DataRetorno,
                 LOWER(TRIM(Prefixo)) AS Prefixo,
                 LOWER(TRIM(Corretor)) AS Corretor,
                 CASE 
@@ -76,10 +76,10 @@ BEGIN
                     ELSE LOWER(TRIM(CascoHangar)) 
                 END AS CascoHangar,
                 LOWER(TRIM(Renovacao)) AS Renovacao,
-				public.cast_date(Vigencia) AS Vigencia,
+				Corp.cast_date(Vigencia) AS Vigencia,
                 LOWER(TRIM(Subscritor)) AS Subscritor,
-	            public.cast_decimal(MoedaReal) AS MoedaReal,
-                public.cast_decimal(MoedaDolar)AS MoedaDolar,
+	            Corp.cast_decimal(MoedaReal) AS MoedaReal,
+                Corp.cast_decimal(MoedaDolar)AS MoedaDolar,
                 CASE 
                     WHEN StatusCotacao IS NOT NULL THEN LOWER(TRIM(StatusCotacao))
                     WHEN Informacao LIKE 'Dec%Nado%' THEN 'declinado'
@@ -93,10 +93,10 @@ BEGIN
 				
         -- Remove dados previamente existentes
         DELETE FROM Aeronautico.histCotacao
-        WHERE BrokerRequest >= date_initial AND BrokerRequest < date_initial + INTERVAL '1 day';
+        WHERE RetornoCorretor >= date_initial AND RetornoCorretor < date_initial + INTERVAL '1 day';
 
         -- Insere novos dados
-        INSERT INTO Aeronautical_Hist_Quote
+        INSERT INTO Aeronautico.histCotacao
             SELECT 
                 Arquivo
                 ,Aba
@@ -111,7 +111,7 @@ BEGIN
                 ,Vigencia AS VigenciaInicio
                 ,Subscritor
                 ,MoedaReal AS PremioLiquidoReal
-                ,MoedaFolar AS PremioLiquidoDolar
+                ,MoedaDolar AS PremioLiquidoDolar
                 ,StatusCotacao
                 ,Informacao
             FROM RawData;
@@ -138,8 +138,8 @@ DECLARE
 BEGIN
     -- Verifica se os parâmetros de data são nulos e os define a partir do banco
     IF date_initial IS NULL AND date_final IS NULL THEN
-        SELECT MIN(DATAEMISSAO) INTO date_initial FROM Aeronautico.stgEmissao;
-        SELECT MAX(DATAEMISSAO) INTO date_final FROM Aeronautico.stgEmissao;
+        SELECT MIN(DataEmissao) INTO date_initial FROM Aeronautico.stgEmissao;
+        SELECT MAX(DataEmissao) INTO date_final FROM Aeronautico.stgEmissao;
     END IF;
 
     -- Define nível de isolamento de transação
@@ -159,13 +159,13 @@ BEGIN
 				,LOWER(TRIM(NumeroApolice)) AS NumeroApolice
 				,LOWER(TRIM(TipoDocumento)) AS TipoDocumento
 				,DataEmissao
-				,public.cast_date(VigenciaInicial) AS VigenciaInicial
-				,public.cast_date(VigenciaFinal) AS VigenciaFinal
-				,public.cast_decimal(PremioLiquido) AS PremioLiquido
-				,public.cast_decimal(ComissaoTotal) AS ComissaoTotal
-				,public.cast_decimal(ComissaoTotalValor) AS ComissaoTotalValor
-				,public.cast_decimal(QuantidadeParcela) AS QuantidadeParcela
-				,public.cast_date(PrimeiroVencimentoParcela) AS PrimeiroVencimentoParcela
+				,Corp.cast_date(VigenciaInicial) AS VigenciaInicial
+				,Corp.cast_date(VigenciaFinal) AS VigenciaFinal
+				,Corp.cast_decimal(PremioLiquido) AS PremioLiquido
+				,Corp.cast_decimal(ComissaoTotal) AS ComissaoTotal
+				,Corp.cast_decimal(ComissaoTotalValor) AS ComissaoTotalValor
+				,Corp.cast_decimal(QuantidadeParcela) AS QuantidadeParcela
+				,Corp.cast_date(PrimeiroVencimentoParcela) AS PrimeiroVencimentoParcela
 				,LOWER(TRIM(Corretor)) AS Corretor
 				,LOWER(TRIM(Prefixo)) AS Prefixo
 				,LOWER(TRIM(Cedente)) AS Cedente
@@ -173,20 +173,20 @@ BEGIN
 				,LOWER(TRIM(Modelo)) AS Modelo
 				,CASE WHEN LENGTH(AnoFabricacao) < 5 THEN AnoFabricacao::INT ELSE NULL END AS AnoFabricacao
 				,LOWER(TRIM(Utilizacao)) AS UTILIZACAO
-				,public.cast_decimal(ImportanciaSeguradaCasco) AS ImportanciaSeguradaCasco
-				,public.cast_decimal(PremioLiquidoCasco) AS PremioLiquidoCasco
-				,public.cast_decimal(ImportanciaSeguradaLuc) AS ImportanciaSeguradaLuc
-				,public.cast_decimal(PremioLiquidoLuc) AS PremioLiquidoLuc
-				,public.cast_decimal(PremioLiquidoConvertido) AS PremioLiquidoConvertido
-				,public.cast_decimal(TaxaCambialEmissao) AS TaxaCambialEmissao
+				,Corp.cast_decimal(ImportanciaSeguradaCasco) AS ImportanciaSeguradaCasco
+				,Corp.cast_decimal(PremioLiquidoCasco) AS PremioLiquidoCasco
+				,Corp.cast_decimal(ImportanciaSeguradaLuc) AS ImportanciaSeguradaLuc
+				,Corp.cast_decimal(PremioLiquidoLuc) AS PremioLiquidoLuc
+				,Corp.cast_decimal(PremioLiquidoConvertido) AS PremioLiquidoConvertido
+				,Corp.cast_decimal(TaxaCambialEmissao) AS TaxaCambialEmissao
 				,CASE WHEN Renovacao = 'Sim' THEN 1 ELSE 0 END AS Renovacao
             FROM Aeronautico.stgEmissao
-            WHERE DATAEMISSAO >= date_initial
-            AND DATAEMISSAO < date_initial + INTERVAL '1 day';
+            WHERE DataEmissao >= date_initial
+            AND DataEmissao < date_initial + INTERVAL '1 day';
 
         -- Remove entradas existentes
         DELETE FROM Aeronautico.histEmissao
-        WHERE IssueDate >= date_initial AND IssueDate < date_initial + INTERVAL '1 day';
+        WHERE Emissao >= date_initial AND Emissao < date_initial + INTERVAL '1 day';
 
         -- Insere novos dados
         INSERT INTO Aeronautico.histEmissao
@@ -204,8 +204,8 @@ END $procedure$;
 
 
 -- MARK: Hist Claim
-DROP PROCEDURE IF EXISTS Sinistro.uspSinistroHist;
-CREATE OR REPLACE PROCEDURE Sinistro.uspSinistroHist(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Sinistro.uspHist;
+CREATE OR REPLACE PROCEDURE Sinistro.uspHist(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql
 AS $procedure$
 BEGIN
@@ -232,39 +232,39 @@ BEGIN
                 ,NumeroApolice
                 ,LOWER(TRIM(Corretor)) AS Corretor
                 ,LOWER(TRIM(Regulador)) AS Regulador
-                ,Cast_Int(NumeroRamo) AS Ramo
+                ,Corp.Cast_Int(NumeroRamo) AS Ramo
                 ,InicioVigencia AS VigenciaInicial
-                ,Cast_Date(FimVigencia) AS VigenciaFinal
-                ,Cast_Int(Contrato) AS Contrato
-                ,Cast_Date(Aviso) AS Aviso
+                ,Corp.Cast_Date(FimVigencia) AS VigenciaFinal
+                ,Corp.Cast_Int(Contrato) AS Contrato
+                ,Corp.Cast_Date(DataAviso) AS Aviso
                 ,LOWER(TRIM(CoberturaAcionada)) AS CoberturaAcionada
-                ,Cast_Decimal(LmiCobertura)AS LmiCobertura
-                ,Cast_Decimal(PrejuizoEstimado) AS PrejuizoEstimado
-                ,Cast_Decimal(ValorReclamado) AS ValorReclamado
-                ,Cast_Decimal(ValorApurado) AS ValorApurado
-                ,Cast_Decimal(FranquiaPos) AS FranquiaParticipacaoObrigatoriaSegurado
-                ,Cast_Decimal(IndizacaoPendente) AS IndizacaoPendente
-                ,Cast_Decimal(HonorarioRegulacao) AS HonorarioRegulacao
-                ,Cast_Decimal(DespesaRegulacao) AS DespesaRegulacao
-                ,Cast_Decimal(TotalPagoIndenizacaoDespesa) AS TotalPagoIndenizacaoDespesa
+                ,Corp.Cast_Decimal(LmiCobertura)AS LmiCobertura
+                ,Corp.Cast_Decimal(PrejuizoEstimado) AS PrejuizoEstimado
+                ,Corp.Cast_Decimal(ValorReclamado) AS ValorReclamado
+                ,Corp.Cast_Decimal(ValorApurado) AS ValorApurado
+                ,Corp.Cast_Decimal(FranquiaPos) AS FranquiaParticipacaoObrigatoriaSegurado
+                ,Corp.Cast_Decimal(IndizacaoPendente) AS IndizacaoPendente
+                ,Corp.Cast_Decimal(HonorarioRegulacao) AS HonorarioRegulacao
+                ,Corp.Cast_Decimal(DespesaRegulacao) AS DespesaRegulacao
+                ,Corp.Cast_Decimal(TotalPagoIndenizacaoDespesa) AS TotalPagoIndenizacaoDespesa
                 ,LOWER(TRIM(SinistroSemIndenizacaoJustificarMotivo)) AS SinistroSemIndenizacaoJustificarMotivo
                 ,NumeroSinistro AS Sinistro
-                ,Cast_Date(DataOcorrenciaSinistro) AS DataOcorrenciaSinistro
+                ,Corp.Cast_Date(DataOcorrenciaSinistro) AS DataOcorrenciaSinistro
                 ,LOWER(TRIM(AeronaveHangar)) AS AeronaveHangar
                 ,LOWER(TRIM(Piloto)) AS Piloto
                 ,LOWER(TRIM(CodigoAnac)) AS CodigoAnac
                 ,LOWER(TRIM(Prefixo)) AS Prefixo
-                ,CASE WHEN LENGTH(Ano) < 5 THEN Cast_Int(Ano) ELSE NULL END AS ANO
+                ,CASE WHEN LENGTH(Ano) < 5 THEN Corp.Cast_Int(Ano) ELSE NULL END AS ANO
                 ,LOWER(TRIM(Utilizacao)) AS Utilizacao
                 ,LOWER(TRIM(Causa)) AS Causa
-                ,Cast_Decimal(LmiSegurado) AS LmiSegurado
-                ,Cast_Decimal(ValorReservaRelatorioPreliminar) AS ValorReservaRelatorioPreliminar
+                ,Corp.Cast_Decimal(LmiSegurado) AS LmiSegurado
+                ,Corp.Cast_Decimal(ValorReservaRelatorioPreliminar) AS ValorReservaRelatorioPreliminar
                 ,CASE WHEN LEFT(Moeda,3) = 'USD' THEN 1 ELSE NULL END AS Moeda
-                ,Cast_Decimal(Adiantamento) AS Adiantamento
-                ,Cast_Decimal(IndenizacaoLiquidaPagaFinal) AS IndenizacaoLiquidaPagaFinal
-                ,Cast_Decimal(DespesaRemocao) AS DespesaRemocao
+                ,Corp.Cast_Decimal(Adiantamento) AS Adiantamento
+                ,Corp.Cast_Decimal(IndenizacaoLiquidaPagaFinal) AS IndenizacaoLiquidaPagaFinal
+                ,Corp.Cast_Decimal(DespesaRemocao) AS DespesaRemocao
                 ,NumeroBordero AS NumeroBordero
-                ,Cast_Date(DataPagamento) AS DataPagamento
+                ,Corp.Cast_Date(DataPagamento) AS DataPagamento
             FROM Sinistro.stg
             WHERE InicioVigencia >= date_initial
             AND InicioVigencia < date_initial + INTERVAL '1 day';
@@ -343,11 +343,11 @@ BEGIN
 END $procedure$;
 
 
--- PROCEDURE: public.USP_Dim_Update(date, date)
+-- PROCEDURE: Corp.USP_Dim_Update(date, date)
 
--- DROP PROCEDURE IF EXISTS public.USP_Dim_Update(date, date);
+-- DROP PROCEDURE IF EXISTS Corp.USP_Dim_Update(date, date);
 
-CREATE OR REPLACE PROCEDURE Corp.USP_Dim_Update(
+CREATE OR REPLACE PROCEDURE Corp.uspDimUpdate(
 	IN date_initial date DEFAULT NULL::date,
 	IN date_final date DEFAULT NULL::date)
 LANGUAGE 'plpgsql'
