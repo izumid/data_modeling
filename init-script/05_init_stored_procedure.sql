@@ -44,8 +44,8 @@ LANGUAGE plpgsql AS $function$
 $function$;
 
 -- MARK: Quote Hist
-DROP PROCEDURE IF EXISTS Aeronautico.uspAeronauticoHistCotacao;
-CREATE OR REPLACE PROCEDURE Aeronautico.uspAeronauticoHistCotacao(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Aeronautico.uspHistCotacao;
+CREATE OR REPLACE PROCEDURE Aeronautico.uspHistCotacao(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql AS $procedure$
 BEGIN 
     -- SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
@@ -129,8 +129,8 @@ $procedure$;
 
 
 -- MARK: Issuance Hist
-DROP PROCEDURE IF EXISTS Aeronautico.uspAeronauticoHistEmissao(IN date_initial DATE, IN date_final DATE);
-CREATE OR REPLACE PROCEDURE Aeronautico.uspAeronauticoHistEmissao(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
+DROP PROCEDURE IF EXISTS Aeronautico.uspHistEmissao(IN date_initial DATE, IN date_final DATE);
+CREATE OR REPLACE PROCEDURE Aeronautico.uspHistEmissao(IN date_initial DATE DEFAULT NULL, IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql
 AS $procedure$
 DECLARE
@@ -289,7 +289,6 @@ END $procedure$;
 
 -- MARK: Quote Fact
 DROP PROCEDURE IF EXISTS Aeronautico.uspFactQuote;
-
 CREATE OR REPLACE PROCEDURE Aeronautico.uspFactQuote(IN date_initial DATE, IN date_final DATE)
 LANGUAGE plpgsql
 AS $procedure$
@@ -315,7 +314,7 @@ BEGIN
                 hist.BrokerRequest,
                 hist.AsasRequestReturn,
                 hist.BrokerRequestReturn,
-                da.id AS CodNacionality,
+                da.id AS Prefixo,
                 db.id AS Broker,
                 dc.id AS Coverage,
                 CASE WHEN hist.Renewal = 'N' THEN NULL ELSE 1 END AS Renewal,
@@ -327,7 +326,7 @@ BEGIN
             FROM Aeronautical_Hist_Quote AS hist
             LEFT JOIN Dim_File AS df ON df.Name = hist.Filename
             LEFT JOIN Dim_Sheet AS ds ON ds.Name = hist.Sheet
-            LEFT JOIN Dim_Airship AS da ON da.CodNacionality = hist.CodNacionality
+            LEFT JOIN Dim_Airship AS da ON da.Prefixo = hist.Prefixo
             LEFT JOIN Dim_Broker AS db ON db.Name = hist.Broker
             LEFT JOIN Dim_Coverage AS dc ON dc.Name = hist.Coverage
             LEFT JOIN Dim_Employee AS de ON de.Name = hist.Underwriter
@@ -343,10 +342,7 @@ BEGIN
 END $procedure$;
 
 
--- PROCEDURE: Corp.USP_Dim_Update(date, date)
-
--- DROP PROCEDURE IF EXISTS Corp.USP_Dim_Update(date, date);
-
+DROP PROCEDURE IF EXISTS Corp.uspDimUpdate(date, date);
 CREATE OR REPLACE PROCEDURE Corp.uspDimUpdate(
 	IN date_initial date DEFAULT NULL::date,
 	IN date_final date DEFAULT NULL::date)
@@ -365,124 +361,124 @@ AS $procedure$
 			DROP TABLE IF EXISTS tempDimData;
 			CREATE TEMP TABLE tempDimData AS
 				SELECT
-				  Filename
-				  ,Sheet
-				  ,NULL AS Insured
-				  ,CodNacionality
+				  Arquivo
+				  ,Aba
+				  --,NULL AS Insured
+				  ,Prefixo
 				  ,NULL AS CodAnac
-				  ,Broker
-				  ,BrokerRequest AS CtrlDate
-				  ,Coverage
-				  ,Underwriter
-				  ,Status
-				  ,Description
-				  ,NULL AS Assignor
-				  ,NULL AS Manufacturer
-				  ,NULL AS AirshipModel
-				  ,NULL AS AirshipManufactureYear
-				  ,NULL AS AirshipUsage
-				  ,NULL AS Pilot
+				  ,Corretor
+				  ,RetornoCorretor AS "Controle"
+				  ,Cobertura
+				  ,Subscritor
+				  ,Situacao
+                  ,Informacao
+				  ,NULL AS "Cedente"
+				  ,NULL AS "Fabricante"
+				  ,NULL AS "ModeloAeronave"
+				  ,NULL AS "AnoFabricacaoAeronave"
+				  ,NULL AS "UsoAeronave"
+				  ,NULL AS "Piloto"
 				  ,1 AS Source
-				FROM Aeronautical_Hist_Quote
-				WHERE BrokerRequest >= date_initial
-				AND BrokerRequest < date_initial + INTERVAL '1 day'
+				FROM Aeronautico.histCotacao
+				WHERE RetornoCorretor >= date_initial
+				AND RetornoCorretor < date_initial + INTERVAL '1 day'
 
 				UNION ALL
 
 				SELECT 
-				  Filename
-				  ,Sheet
-				  ,Insured
-				  ,CodNacionality
+				  Arquivo
+				  ,Aba
+				  --,Insured
+				  ,Prefixo
 				  ,NULL AS CodAnac
-				  ,Broker
-				  ,IssueDate AS CtrlDate
-				  ,Coverage
-				  ,NULL AS Underwriter
-				  ,PolicyTpe AS "Status"
-				  ,NULL AS Description
-				  ,Assignor
-				  ,Manufacturer
-				  ,AirshipModel
-				  ,AirshipManufactureYear
-				  ,AirshipUsage
-				  ,NULL AS Pilot
+				  ,Corretor
+				  ,Emissao AS "Controle"
+				  ,Ramo
+				  ,NULL AS "Subscritor"
+				  ,ApoliceTipo AS "Situacao"
+				  ,NULL AS "Informacao"
+				  ,Cedente
+				  ,Fabricante
+				  ,ModeloAeronave
+				  ,AnoFabricacaoAeronave
+				  ,UsoAeronave
+				  ,NULL AS Piloto
 				  ,2 AS Source
-				FROM Aeronautical_Hist_Issuance
-				WHERE IssueDate  >= date_initial
-				AND IssueDate < date_initial + INTERVAL '1 day'
+				FROM Aeronautico.histEmissao
+				WHERE Emissao  >= date_initial
+				AND Emissao < date_initial + INTERVAL '1 day'
 
 				UNION ALL
 
 				SELECT 
-				  Filename
-				  ,Sheet
-				  ,Insured
-				  ,CodNacionality
-				  ,CodAnac
-				  ,Broker
-  				,OcorrenceClaim AS CtrlDate
-				  ,RequestedCoverage AS "Coverage"
-				  ,NULL AS Underwriter
-				  ,Status
-				  ,NULL AS Description
-				  ,Assignor
-				  ,NULL AS Manufacturer
-				  ,NULL AS AirshipModel
-				  ,NULL AS AirshipManufactureYear
-				  ,NULL AS AirshipUsage
-				  ,Pilot
+				  Arquivo
+				  ,Aba
+				  --,Insured
+				  ,Prefixo
+				  ,CodigoAnac
+				  ,Corretor
+  				  ,Ocorrencia AS "Controle"
+				  ,Cobertura AS "Coverage"
+				  ,NULL AS "Subscritor"
+				  ,Situacao
+				  ,NULL AS "Informacao"
+				  ,Cedente
+				  ,NULL AS "Fabricante"
+				  ,NULL AS "ModeloAeronave"
+				  ,NULL AS "AnoFabricacaoAeronave"
+				  ,NULL AS "UsoAeronave"
+				  ,Piloto
 				  ,3 AS Source
-				FROM Claim_Hist
-				WHERE IssuanceStart >= date_initial
-				AND IssuanceStart < date_initial + INTERVAL '1 day';
+				FROM Sinistro.hist
+				WHERE VigenciaInicial >= date_initial
+				AND VigenciaInicial < date_initial + INTERVAL '1 day';
 		
 			-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 			
 			-- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      
 			-- insere dados de cotação
-			INSERT INTO Dim_Airship (CodNacionality)
+			INSERT INTO Aeronautico.dimAeronave (Prefixo)
 				SELECT DISTINCT
-					LEFT(CodNacionality, 50)
+					LEFT(CodNacionalidade, 50)
 				FROM tempDimData AS orig
-				WHERE CodNacionality IS NOT NULL
+				WHERE CodNacionalidade IS NOT NULL
 				AND orig.Source = 1
 				AND NOT EXISTS(
 					SELECT 1 
-					FROM Dim_Airship AS dest
+					FROM Aeronautico.dimAeronave AS dest
 					WHERE 1=1
-					AND dest.CodNacionality = orig.CodNacionality
+					AND dest.Prefixo = orig.Prefixo
 					-- AND da.FinalDateControl IS NULL
 				);
         
         
         -- atualiza dados das aeronaves cotadas com os dados de emissao
-        MERGE INTO Dim_Airship as dest
+        MERGE INTO Aeronautico.dimAeronave as dest
           USING(
             SELECT DISTINCT          
-              CodNacionality
-              ,Manufacturer
-            	,AirshipManufactureYear
-              ,AirshipModel
-              ,AirshipUsage
+              Prefixo
+              ,Fabricante
+              ,Modelo
+              ,AnoFabricacao
+              ,TipoUtilizacao
             FROM tempDimData
-            WHERE CodNacionality IS NOT NULL
+            WHERE Prefixo IS NOT NULL
 			AND Source = 2
 			-- AND IssueDate >= date_initial
 			-- AND IssueDate < date_initial + INTERVAL '1 day'
-          ) AS orig ON dest.CodNacionality = orig.CodNacionality
-         	WHEN MATCHED THEN 
-          UPDATE SET
-          		CodNacionality 		= orig.CodNacionality
-              	,Manufacturer 		= orig.Manufacturer
-            	,ManufactureYear	= orig.AirshipManufactureYear
-              	,Model 				= orig.AirshipModel
-              ,	AirshipUsage	 	= orig.AirshipUsage
-           WHEN NOT MATCHED THEN
-           	INSERT(CodNacionality,Manufacturer,ManufactureYear,Model,AirshipUsage)
-            VALUES(orig.CodNacionality,orig.Manufacturer,orig.AirshipManufactureYear,orig.AirshipModel,orig.AirshipUsage);
-        
+          ) AS orig ON dest.Prefixo = orig.Prefixo
+        WHEN MATCHED THEN 
+            UPDATE SET
+            Prefixo = orig.Prefixo
+            ,Fabricante      = orig.Fabricante
+            ,AnoFabricacao	 = orig.AnoFabricacaoAeronave
+            ,Modelo 	     = orig.ModeloAeronave
+            ,TipoUtilizacao	 = orig.UsoAeronave
+        WHEN NOT MATCHED THEN
+           INSERT(Prefixo,Fabricante,AnoFabricacao,Modelo,TipoUtilizacao)
+            VALUES(orig.CodNacionalidade,orig.AnoFabricacaoAeronave,orig.AnoFabricacao,orig.ModeloAeronave,orig.UsoAeronave);
+
 	   date_initial := date_initial + INTERVAL '1 day';
  			RAISE NOTICE 'Initial Date: %',date_initial;
       

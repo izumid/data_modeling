@@ -6,7 +6,7 @@ CREATE TABLE Aeronautico.histCotacao(
 	,RequisicaoCorretor DATE NULL
 	,RetornoCorretor DATE NULL
 	,Retorno DATE NULL
-	,CodNacionalidade VARCHAR(150) NULL
+	,Prefixo VARCHAR(150) NULL
 	,Corretor VARCHAR(150) NULL
 	,Cobertura VARCHAR(50) NULL
 	,Renovacao VARCHAR(50) NULL
@@ -37,7 +37,7 @@ CREATE TABLE Aeronautico.histEmissao(
 	,Parcela INT NULL
 	,PrimeiroVencimentoParcela DATE NULL
 	,Corretor VARCHAR(150) NULL
-	,CodNacionalidade VARCHAR(150) NULL
+	,Prefixo VARCHAR(150) NULL
 	,Cedente VARCHAR(255) NULL
 	,Fabricante VARCHAR(255) NULL
 	,ModeloAeronave VARCHAR(255) NULL
@@ -84,7 +84,7 @@ CREATE TABLE Sinistro.hist(
 	,AeronaveHangar VARCHAR(100) NULL
 	,Piloto VARCHAR(255) NULL
 	,CodigoAnac VARCHAR(255) NULL
-	,CodNacionalidade VARCHAR(255) NULL
+	,Prefixo VARCHAR(255) NULL
 	,AeronaveAno INT NULL
 	,AeronaveTipoUtilizacao VARCHAR(255) NULL
 	,Causa VARCHAR(255) NULL

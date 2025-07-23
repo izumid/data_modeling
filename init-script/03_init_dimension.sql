@@ -7,7 +7,7 @@ CREATE SCHEMA Corp;
 DROP TABLE IF EXISTS Corp.dimAeronave;
 CREATE TABLE Corp.dimAeronave(
      Id 				SERIAL
-	,CodNacionalidade 	VARCHAR(50)	NULL
+	,Prefixo 			VARCHAR(50)	NULL
 	,CodAnac 			INT	NULL
 	,Fabricante 		VARCHAR(255) NULL
 	,AnoFabricacao 		SMALLINT NULL
@@ -121,7 +121,7 @@ CREATE TABLE Corp.dimRegulador(
 DROP TABLE IF EXISTS Aeronautico.dimAeronave;
 CREATE TABLE Aeronautico.dimAeronave(
      Id					SERIAL
-	,CodNacionalidade 	VARCHAR(50) NULL
+	,Prefixo 			VARCHAR(50) NULL
 	,Fabricante			VARCHAR(255) NULL
 	,Modelo				VARCHAR(50) NULL
 	,AnoFabricacao 		SMALLINT NULL
@@ -141,7 +141,7 @@ CREATE TABLE Aeronautico.dimTipoUtilizacao(
 DROP TABLE IF EXISTS Sinistro.dimAeronave;
 CREATE TABLE Sinistro.dimAeronave(
      Id 				SERIAL
-	,CodNacionalidade	VARCHAR(50) NULL
+	,Prefixo			VARCHAR(50) NULL
 	,CodAnac			INT NULL
 	,AnoFabricacao 		SMALLINT NULL
 	,Piloto 			VARCHAR(255) NULL
