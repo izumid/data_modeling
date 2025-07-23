@@ -124,5 +124,6 @@ CREATE TABLE Sinistro.stg(
 	,DataVistoria VARCHAR(25)
 	,BemLocalSinistrado VARCHAR(255)
 	,IndenizacaoLiquidaPaga VARCHAR(25)
+	,ressarcimentoseguradora VARCHAR(25)
   
 );
