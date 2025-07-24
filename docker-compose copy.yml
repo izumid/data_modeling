@@ -12,3 +12,4 @@ services:
     volumes:
       - C:/Users/Serv/Desktop/data_modeling/file:/var/lib/postgresql/data
       - C:/Users/Serv/Desktop/data_modeling/init-script:/docker-entrypoint-initdb.d
+    command:  postgres -c max_locks_per_transaction=128 #must be increased to execute procedures
