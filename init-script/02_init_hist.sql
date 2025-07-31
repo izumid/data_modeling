@@ -6,7 +6,7 @@ CREATE TABLE Aeronautico.histCotacao(
 	,RequisicaoCorretor DATE NULL
 	,RetornoCorretor DATE NULL
 	,Retorno DATE NULL
-	,Prefixo VARCHAR(150) NULL
+	,Prefixo VARCHAR(13) NULL
 	,Corretor VARCHAR(150) NULL
 	,Cobertura VARCHAR(50) NULL
 	,Renovacao VARCHAR(50) NULL
@@ -37,7 +37,7 @@ CREATE TABLE Aeronautico.histEmissao(
 	,Parcela INT NULL
 	,PrimeiroVencimentoParcela DATE NULL
 	,Corretor VARCHAR(150) NULL
-	,Prefixo VARCHAR(150) NULL
+	,Prefixo VARCHAR(13) NULL
 	,Cedente VARCHAR(255) NULL
 	,Fabricante VARCHAR(255) NULL
 	,ModeloAeronave VARCHAR(255) NULL
@@ -84,7 +84,7 @@ CREATE TABLE Sinistro.hist(
 	,AeronaveHangar VARCHAR(100) NULL
 	,Piloto VARCHAR(255) NULL
 	,CodigoAnac VARCHAR(255) NULL
-	,Prefixo VARCHAR(255) NULL
+	,Prefixo VARCHAR(13) NULL
 	,AeronaveAno INT NULL
 	,AeronaveTipoUtilizacao VARCHAR(255) NULL
 	,Causa VARCHAR(255) NULL
@@ -123,4 +123,71 @@ CREATE TABLE Sinistro.hist(
 	,AssetLocation VARCHAR(255) NULL
 	,LiquidPaiddIndemnification DOUBLE PRECISION NULL
 	*/
+);
+
+DROP TABLE IF EXISTS Garantia.histCotacao;
+CREATE TABLE Garantia.histCotacao(
+	 Arquivo VARCHAR(255)
+	,Aba VARCHAR(30)
+	,LinhaExcel VARCHAR(255)
+	,Emissao DATE
+	,Vencimento DATE
+	,Finalizacao DATE
+	,Empreendimento VARCHAR(255)
+	,Fiador VARCHAR(255)
+	,Entrada DATE
+	,Subscritor VARCHAR(255)
+	,Situacao VARCHAR(255)
+	,Tomador VARCHAR(255)
+	,CnpjTomador VARCHAR(255)
+	,Segurado VARCHAR(255)
+	,Modalidade VARCHAR(255)
+	,Corretor VARCHAR(255)
+	,Cocorretagem VARCHAR(255)
+	,ComissaoTotal DOUBLE PRECISION NULL
+	,ImportanciaSegurada DOUBLE PRECISION NULL
+	,VigenciaInicial DATE
+	,VigenciaFinal DATE
+	,Taxa DOUBLE PRECISION NULL
+	,Premio DOUBLE PRECISION NULL
+	,FormaPagamento VARCHAR(255)
+	,ComissaoPaga DOUBLE PRECISION NULL
+	,Seguradora VARCHAR(255)
+	,Endosso VARCHAR(255)
+	,Apolice VARCHAR(255)
+	,Desatualizado DATE
+);
+
+
+DROP TABLE IF EXISTS Garantia.histEmissao;
+CREATE TABLE Garantia.histEmissao(
+	 Arquivo VARCHAR(255)
+	,Aba VARCHAR(30)
+	,LinhaExcel VARCHAR(255)
+	,Emissao DATE
+	,Vencimento DATE
+	,Finalizacao DATE
+	,Empreendimento VARCHAR(255)
+	,Fiador VARCHAR(255)
+	,Entrada DATE
+	,Subscritor VARCHAR(255)
+	,Situacao VARCHAR(255)
+	,Tomador VARCHAR(255)
+	,CnpjTomador VARCHAR(255)
+	,Segurado VARCHAR(255)
+	,Modalidade VARCHAR(255)
+	,Corretor VARCHAR(255)
+	,Cocorretagem VARCHAR(255)
+	,ComissaoTotal DOUBLE PRECISION NULL
+	,ImportanciaSegurada DOUBLE PRECISION NULL
+	,VigenciaInicial DATE
+	,VigenciaFinal DATE
+	,Taxa DOUBLE PRECISION NULL
+	,Premio DOUBLE PRECISION NULL
+	,FormaPagamento VARCHAR(255)
+	,ComissaoPaga DOUBLE PRECISION NULL
+	,Seguradora VARCHAR(255)
+	,Endosso VARCHAR(255)
+	,Apolice VARCHAR(255)
+	,Desatualizado DATE
 );

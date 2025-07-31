@@ -1,7 +1,7 @@
-CREATE SCHEMA Aeronautico;
+CREATE SCHEMA IF NOT EXISTS Aeronautico;
 DROP TABLE IF EXISTS Aeronautico.stgCotacao;
 CREATE TABLE Aeronautico.stgCotacao(
-	LinhaExcel INT NOT NULL
+	LinhaExcel VARCHAR(255)
 	,Arquivo VARCHAR(255)
 	,Aba VARCHAR(255)
 	,DataPedido DATE
@@ -19,9 +19,10 @@ CREATE TABLE Aeronautico.stgCotacao(
 	,Informacao VARCHAR(255)
 );
 
+CREATE SCHEMA IF NOT EXISTS Aeronautico;
 DROP TABLE IF EXISTS Aeronautico.stgEmissao;
 CREATE TABLE Aeronautico.stgEmissao(
-	LinhaExcel INT NOT NULL
+	LinhaExcel VARCHAR(255)
 	,Arquivo VARCHAR(255) NULL
 	,Aba VARCHAR(255) NULL
 	,Segurado VARCHAR(255) NULL
@@ -53,10 +54,10 @@ CREATE TABLE Aeronautico.stgEmissao(
 	,Renovacao VARCHAR(255) NULL
 );
 
-CREATE SCHEMA Sinistro;
+CREATE SCHEMA IF NOT EXISTS Sinistro;
 DROP TABLE IF EXISTS Sinistro.stg;
 CREATE TABLE Sinistro.stg(
-	LinhaExcel INT NOT NULL
+	LinhaExcel VARCHAR(255)
 	,Arquivo VARCHAR(255)
 	,Aba VARCHAR(30)
 	,StatusSinistro VARCHAR(100)
@@ -126,4 +127,38 @@ CREATE TABLE Sinistro.stg(
 	,IndenizacaoLiquidaPaga VARCHAR(25)
 	,ressarcimentoseguradora VARCHAR(25)
   
+);
+
+
+CREATE SCHEMA IF NOT EXISTS Garantia;
+DROP TABLE IF EXISTS Garantia.stgCotacao;
+CREATE TABLE Garantia.stgCotacao(
+	LinhaExcel VARCHAR(255)
+	,Arquivo VARCHAR(255)
+	,Aba VARCHAR(30)
+	,DataEmissao VARCHAR(255)
+	,Vencimento VARCHAR(255)
+	,Finalizacao VARCHAR(255)
+	,Empreendimento VARCHAR(255)
+	,Fiador VARCHAR(255)
+	,DataEntrada DATE
+	,Subscritor VARCHAR(255)
+	,Situacao VARCHAR(255)
+	,Tomador VARCHAR(255)
+	,CnpjTomador VARCHAR(255)
+	,Segurado VARCHAR(255)
+	,Modalidade VARCHAR(255)
+	,Corretor VARCHAR(255)
+	,Cocorretagem VARCHAR(255)
+	,ComissaoTotal VARCHAR(255)
+	,ImportanciaSegurada VARCHAR(255)
+	,InicioVigencia VARCHAR(255)
+	,FinalVigencia VARCHAR(255)
+	,Taxa VARCHAR(255)
+	,Premio VARCHAR(255)
+	,FormaPagamento VARCHAR(255)
+	,ComissaoPaga VARCHAR(255)
+	,Seguradora VARCHAR(255)
+	,Endosso VARCHAR(255)
+	,NumeroApolice VARCHAR(255)
 );
