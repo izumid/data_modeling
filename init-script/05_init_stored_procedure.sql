@@ -321,7 +321,8 @@ BEGIN
 			FROM Garantia.stgCotacao
 			WHERE DataEntrada >= date_initial
 			AND DataEntrada < date_initial + INTERVAL '1 day';
-				
+
+		-- deprecate old registries filling the 'desatualizado' field and insert new registries
 		MERGE INTO Garantia.histEmissao AS dest
 			USING(
 				SELECT 
@@ -360,10 +361,10 @@ BEGIN
 					AND dest.Segurado = orig.Segurado
 					AND dest.Modalidade = orig.Modalidade
 					AND dest.corretor = orig.corretor
-					AND dest.VigenciaInicial = orig.VigenciaInicial 
+					AND dest.VigenciaInicial = orig.VigenciaInicial
+					AND dest.apolice = orig.apolice
 				)
-				WHEN MATCHED THEN UPDATE SET 
-					Desatualizado = NOW()
+				WHEN MATCHED THEN UPDATE SET  Desatualizado = NOW()
 				WHEN NOT MATCHED THEN INSERT
 				VALUES( 
 					orig.Arquivo
@@ -395,7 +396,77 @@ BEGIN
 					,orig.Endosso
 					,orig.Apolice
 				);
-
+		
+		-- insert registries thar are already in database (old), but having any change on non main fields
+		INSERT INTO Garantia.histEmissao
+			SELECT 
+				orig.Arquivo
+				,orig.Aba
+				,orig.LinhaExcel
+				,orig.Emissao
+				,orig.Vencimento
+				,orig.Finalizacao
+				,orig.Empreendimento
+				,orig.Fiador
+				,orig.Entrada
+				,orig.Subscritor
+				,orig.Situacao
+				,orig.Tomador
+				,orig.CnpjTomador
+				,orig.Segurado
+				,orig.Modalidade
+				,orig.Corretor
+				,orig.Cocorretagem
+				,orig.ComissaoTotal
+				,orig.ImportanciaSegurada
+				,orig.VigenciaInicial
+				,orig.VigenciaFinal
+				,orig.Taxa
+				,orig.Premio
+				,orig.FormaPagamento
+				,orig.ComissaoPaga
+				,orig.Seguradora
+				,orig.Endosso
+				,orig.Apolice
+			FROM RawData_GR AS orig
+			WHERE 1=1
+			AND EXISTS(
+				SELECT 1 FROM Garantia.histEmissao as dest
+				WHERE 1=1 
+				AND (
+						dest.Fiador = orig.Fiador
+					AND dest.CnpjTomador = orig.CnpjTomador
+					AND dest.Segurado = orig.Segurado
+					AND dest.Modalidade = orig.Modalidade
+					AND dest.corretor = orig.corretor
+					AND dest.VigenciaInicial = orig.VigenciaInicial
+					AND dest.apolice = orig.apolice
+				)
+				AND NOT (
+						orig.Arquivo = dest.Arquivo
+					AND orig.Aba = dest.Aba
+					AND orig.LinhaExcel = dest.LinhaExcel
+					AND orig.Emissao = dest.Emissao
+					AND orig.Vencimento = dest.Vencimento
+					AND orig.Finalizacao = dest.Finalizacao
+					AND orig.Empreendimento = dest.Empreendimento
+					AND orig.Fiador = dest.Fiador
+					AND orig.Entrada = dest.Entrada
+					AND orig.Subscritor = dest.Subscritor
+					AND orig.Situacao = dest.Situacao
+					AND orig.Tomador = dest.Tomador
+					AND orig.Cocorretagem = dest.Cocorretagem
+					AND orig.ComissaoTotal = dest.ComissaoTotal
+					AND orig.ImportanciaSegurada = dest.ImportanciaSegurada
+					AND orig.Taxa = dest.Taxa
+					AND orig.Premio = dest.Premio
+					AND orig.FormaPagamento = dest.FormaPagamento
+					AND orig.ComissaoPaga = dest.ComissaoPaga
+					AND orig.Seguradora = dest.Seguradora
+					AND orig.Endosso = dest.Endosso
+				)
+			);
+		
 		-- go ahed to the next day
 		date_initial := date_initial + INTERVAL '1 day';
 		RAISE NOTICE 'Initial Date: %',date_initial;

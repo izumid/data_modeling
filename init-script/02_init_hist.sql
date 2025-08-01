@@ -188,6 +188,6 @@ CREATE TABLE Garantia.histEmissao(
 	,ComissaoPaga DOUBLE PRECISION NULL
 	,Seguradora VARCHAR(255)
 	,Endosso VARCHAR(255)
-	,Apolice VARCHAR(255)
+	,Apolice BIGIN
 	,Desatualizado DATE
 );
