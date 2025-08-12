@@ -1,8 +1,4 @@
--- MARK: Dimensions
--- Prefix are feed by (Quote,Issuance);
--- ManufactureYear,Id_AirshipUsage (I);
--- Model (I);
--- CodeAnac,Pilot (C);
+-- MARK: Dimension
 CREATE SCHEMA Corp;
 DROP TABLE IF EXISTS Corp.dimAeronave;
 CREATE TABLE Corp.dimAeronave(
@@ -19,7 +15,6 @@ CREATE TABLE Corp.dimAeronave(
 	,PRIMARY KEY (Id)
 );
 
--- MARK: Corp Dim
 DROP TABLE IF EXISTS Corp.dimArquivo;
 CREATE TABLE Corp.dimArquivo(
     Id Serial
@@ -62,7 +57,6 @@ INSERT INTO  Corp.dimCargo (Nome) VALUES
 ,('Estagiário');
 
 
--- MARK: Quote
 DROP TABLE IF EXISTS Corp.dimCorretor;
 CREATE TABLE Corp.dimCorretor(
     Id Serial
@@ -85,7 +79,6 @@ CREATE TABLE Corp.dimCotacaoSituacao(
 );
 
 
--- MARK: Issuance
 DROP TABLE IF EXISTS Corp.dimEmissaoSituacao;
 CREATE TABLE Corp.dimEmissaoSituacao(
 	Id Serial
@@ -117,51 +110,60 @@ CREATE TABLE Corp.dimRegulador(
 );
 
 
--- MARK: Aeronautico
-DROP TABLE IF EXISTS Aeronautico.dimAeronave;
-CREATE TABLE Aeronautico.dimAeronave(
-     Id					SERIAL
-	,Prefixo 			VARCHAR(50) NULL
-	,Fabricante			VARCHAR(255) NULL
-	,Modelo				VARCHAR(50) NULL
-	,AnoFabricacao 		SMALLINT NULL
-	--,IdAirshipUsage 	INT NULL
-	,TipoUtilizacao		VARCHAR(255) NULL
-	,RegistroEncerrado 	DATE NULL
-	,PRIMARY KEY (Id)
-);
+-- MARK: UDF Try Cast
+-- postgress highly typed a function must have a typed return
+DROP FUNCTION IF EXISTS Corp.Cast_Date(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Date(IN input_value TEXT) RETURNS DATE 
+LANGUAGE plpgsql AS $function$
+	DECLARE result DATE;
+	BEGIN
+		BEGIN
+		result := input_value::DATE;
+		EXCEPTION WHEN others THEN
+			result := NULL;
+	END;
+		RETURN result;
+	END;
+$function$;
 
-DROP TABLE IF EXISTS Aeronautico.dimTipoUtilizacao;
-CREATE TABLE Aeronautico.dimTipoUtilizacao(
-	 Id Serial
-	,Nome VARCHAR(255)
-	,PRIMARY KEY (Id)
-);
+DROP FUNCTION IF EXISTS Corp.Cast_Decimal(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Decimal(IN input_value TEXT) RETURNS DECIMAL(15,4)
+LANGUAGE plpgsql AS $function$
+	DECLARE result DECIMAL(15,4);
+	BEGIN
+		BEGIN
+		result := input_value::DECIMAL(15,4);
+		EXCEPTION WHEN others THEN
+			result := NULL;
+		END;
+		RETURN result;
+	END;
+$function$;
 
-DROP TABLE IF EXISTS Sinistro.dimAeronave;
-CREATE TABLE Sinistro.dimAeronave(
-     Id 				SERIAL
-	,Prefixo			VARCHAR(50) NULL
-	,CodAnac			INT NULL
-	,AnoFabricacao 		SMALLINT NULL
-	,Piloto 			VARCHAR(255) NULL
-	,TipoUtilizacao 	VARCHAR(255) NULL
-	,RegistroEncerrado 	DATE NULL
-	,PRIMARY KEY (Id)
-);
+DROP FUNCTION IF EXISTS Corp.Cast_Int(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_Int(IN input_value TEXT) RETURNS INTEGER 
+LANGUAGE plpgsql AS $function$
+	DECLARE result INTEGER;
+	BEGIN
+		BEGIN
+		result := input_value::INTEGER;
+		EXCEPTION WHEN others THEN
+			result := NULL;
+		END;
+		RETURN result;
+	END;
+$function$;
 
-
--- MARK: Sinistro
-DROP TABLE IF EXISTS Sinistro.dimCausa;
-CREATE TABLE Sinistro.dimCausa(
-    Id Serial
-    ,Nome varchar(50) NOT NULL
-    ,PRIMARY KEY (Id)
-);
-
-DROP TABLE IF EXISTS  Sinistro.dimSituacao;
-CREATE TABLE Sinistro.dimSituacao(
-	Id Serial
-	,Nome VARCHAR(50)
-	,PRIMARY KEY (Id)
-);
+DROP FUNCTION IF EXISTS Corp.Cast_BigInt(IN input_value TEXT);
+CREATE FUNCTION Corp.Cast_BigInt(IN input_value TEXT) RETURNS INTEGER 
+LANGUAGE plpgsql AS $function$
+	DECLARE result INTEGER;
+	BEGIN
+		BEGIN
+		result := input_value::BIGINT;
+		EXCEPTION WHEN others THEN
+			result := NULL;
+		END;
+		RETURN result;
+	END;
+$function$;
