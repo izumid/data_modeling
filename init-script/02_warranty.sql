@@ -104,7 +104,6 @@ CREATE TABLE Garantia.histEmissao(
 
 
 -- MARK: USP STG
--- MARK: USP Quote
 DROP PROCEDURE IF EXISTS Garantia.uspHistCotacao;
 CREATE OR REPLACE PROCEDURE Garantia.uspHistCotacao(IN date_initial DATE DEFAULT NULL,IN date_final DATE DEFAULT NULL)
 LANGUAGE plpgsql AS $procedure$
@@ -308,7 +307,6 @@ BEGIN
 	DROP TABLE IF EXISTS RawData_GR;
 END;
 $procedure$;
-
 
 
 -- MARK: USP HIST
